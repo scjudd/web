@@ -1,9 +1,5 @@
 package forms
 
-import (
-	"html/template"
-)
-
 type ErrFieldDoesNotExist struct {
 	Name string
 }
@@ -33,7 +29,7 @@ func (f *Form) Valid() bool {
 	return true
 }
 
-func (f *Form) FieldHTML(name string) (template.HTML, error) {
+func (f *Form) FieldHTML(name string) (string, error) {
 	if field, ok := f.Fields[name]; ok {
 		if f.Submitted {
 			if valid, _ := field.Valid(); !valid {
@@ -45,14 +41,14 @@ func (f *Form) FieldHTML(name string) (template.HTML, error) {
 	return "", &ErrFieldDoesNotExist{name}
 }
 
-func (f *Form) FieldInvalidReason(name string) (template.HTML, error) {
+func (f *Form) FieldInvalidReason(name string) (string, error) {
 	if field, ok := f.Fields[name]; ok {
 		if f.Submitted {
 			if valid, reason := field.Valid(); !valid {
-				return template.HTML(reason), nil
+				return reason, nil
 			}
 		}
-		return template.HTML(""), nil
+		return "", nil
 	}
-	return template.HTML(""), &ErrFieldDoesNotExist{name}
+	return "", &ErrFieldDoesNotExist{name}
 }

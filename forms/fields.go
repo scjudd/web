@@ -2,7 +2,6 @@ package forms
 
 import (
 	"fmt"
-	"html/template"
 	"strings"
 )
 
@@ -15,10 +14,10 @@ type Field interface {
 	AddClass(string)
 }
 
-func FieldHTML(f Field, name string) template.HTML {
-	return template.HTML(fmt.Sprintf(
+func FieldHTML(f Field, name string) string {
+	return fmt.Sprintf(
 		"<input type=\"%s\" name=\"%s\" class=\"%s\" value=\"%s\">",
-		f.Type(), name, strings.Join(f.GetClasses(), " "), f.GetValue()))
+		f.Type(), name, strings.Join(f.GetClasses(), " "), f.GetValue())
 }
 
 type BaseField struct {
