@@ -4,20 +4,28 @@ import (
 	"html/template"
 )
 
-func NewTemplateForm() *TemplateForm {
-	return &TemplateForm{New()}
-}
-
 type TemplateForm struct {
-	*Form
+	Form
+	Submitted bool
 }
 
-func (f *TemplateForm) FieldHTML(name string) (template.HTML, error) {
-	str, err := f.Form.FieldHTML(name)
-	return template.HTML(str), err
+func (f TemplateForm) FieldHTML(name string) (template.HTML, error) {
+	field, err := f.Get(name)
+	if err != nil {
+		return template.HTML(""), err
+	}
+	return template.HTML(field.HTML()), nil
 }
 
-func (f *TemplateForm) FieldInvalidReason(name string) (template.HTML, error) {
-	str, err := f.Form.FieldInvalidReason(name)
-	return template.HTML(str), err
+func (f TemplateForm) FieldInvalidReason(name string) (string, error) {
+	if f.Submitted {
+		field, err := f.Get(name)
+		if err != nil {
+			return "", err
+		}
+		if valid, reason := field.Valid(); !valid {
+			return reason, nil
+		}
+	}
+	return "", nil
 }
