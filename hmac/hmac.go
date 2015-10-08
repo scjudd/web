@@ -8,24 +8,31 @@ import (
 )
 
 var (
-	Secret         []byte
-	ErrBlankSecret = errors.New("secret must not be blank")
+	secret         []byte
+	ErrBlankSecret = errors.New("Secret must not be blank!")
 )
 
-func Sign(s string) (string, error) {
-	if Secret == nil {
-		return "", ErrBlankSecret
+func Init(s []byte) {
+	if s == nil || len(s) == 0 {
+		panic(ErrBlankSecret)
 	}
-	h := hmac.New(sha512.New, Secret)
+	secret = s
+}
+
+func Sign(s string) string {
+	if secret == nil {
+		panic(ErrBlankSecret)
+	}
+	h := hmac.New(sha512.New, secret)
 	h.Write([]byte(s))
-	return base64.StdEncoding.EncodeToString(h.Sum(nil)), nil
+	return base64.StdEncoding.EncodeToString(h.Sum(nil))
 }
 
 func Equal(s, mac string) (bool, error) {
-	if Secret == nil {
-		return false, ErrBlankSecret
+	if secret == nil {
+		panic(ErrBlankSecret)
 	}
-	mac1 := hmac.New(sha512.New, Secret)
+	mac1 := hmac.New(sha512.New, secret)
 	mac1.Write([]byte(s))
 	mac2, err := base64.StdEncoding.DecodeString(mac)
 	if err != nil {
