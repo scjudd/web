@@ -2,6 +2,7 @@ package forms
 
 import (
 	"github.com/scjudd/web/forms/fields"
+	"net/url"
 )
 
 type ErrFieldDoesNotExist struct {
@@ -22,12 +23,29 @@ func New() Form {
 	return make(form)
 }
 
+func Parse(f Form, values url.Values) {
+	for k, _ := range values {
+		if field, err := f.Get(k); err == nil {
+			field.SetValue(values.Get(k))
+		}
+	}
+}
+
 func Value(f Form, name string) string {
 	field, err := f.Get(name)
 	if err == nil {
 		return field.GetValue()
 	}
 	return ""
+}
+
+func SetValue(f Form, name, value string) error {
+	field, err := f.Get(name)
+	if err != nil {
+		return &ErrFieldDoesNotExist{name}
+	}
+	field.SetValue(value)
+	return nil
 }
 
 type form map[string]fields.Field
